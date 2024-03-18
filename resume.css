@@ -1,0 +1,7 @@
+.bg-eff3e3 {
+    background-color: #EFF3E3;
+}
+
+#personalityPieChart {
+    max-width: 100%; /* Ensure the SVG scales properly */
+}

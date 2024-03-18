@@ -1,38 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John Riley - Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Add any additional meta tags, stylesheets, or scripts here -->
+    <title>Two-Column Resume - Tailwind</title>
+    <!-- Include the Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Custom style sheet -->
+    <link href="resume.css" rel="stylesheet">
+    <style>
+        /* Add custom styles here if needed */
+    </style>
+    <!-- Include D3.js from a CDN -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
-<body>
-    <header>
-        <h1>Welcome to John Riley's Portfolio</h1>
-        <!-- Add any navigation or header content here -->
-    </header>
 
-    <main>
-        <section id="about">
-            <h2>About Me</h2>
-            <p>Replace this with information about yourself and your skills.</p>
-        </section>
-
-        <section id="projects">
-            <h2>Projects</h2>
-            <div class="project">
-                <h3>Project 1</h3>
-                <p>Description of Project 1</p>
-                <!-- Add more project details as needed -->
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <!-- Left Column -->
+            <div class="col-span-1 bg-white rounded-lg shadow-md">
+                <div class="grid grid-rows-3 gap-2 p-2">
+                    <!-- Mug and title -->
+                    <div class="bg-eff3e3 rounded-md p-4 text-center">
+                        <h2 class="text-xl font-bold mb-2">
+                            <span class="font-normal">Resume for </span>
+                            <span class="text-xl font-bold mb-2">John Riley</span>
+                        </h2>
+                        <!-- Add the image here -->
+                        <img id="profileImage" src="jr-mug.png" alt="John Riley's Picture" class="w-full max-w-xs mx-auto rounded-full mb-4">
+                        <p>Passionate Trainer, Part-time Technologist, Professional Learner</p>
+                    </div>
+                    <!-- Certifications -->
+                    <div class="bg-eff3e3 rounded-md p-2">
+                        <h2 class="text-xl font-bold mb-2">Certifications</h2>
+                        <ul id="certificationsList" class="list-none p-0">
+                            <!-- Certifications will be dynamically populated here -->
+                        </ul>
+                    </div>
+                    <!-- Personality -->
+                    <div class="bg-eff3e3 rounded-md p-4 flex flex-col">
+                        <!-- Top section containing the title -->
+                        <div class="mb-4">
+                            <h2 class="text-xl font-bold mb-2">Personality</h2>
+                        </div>
+                        <!-- Bottom section containing the pie chart -->
+                        <div class="flex-grow">
+                            <!-- SVG container for the pie chart -->
+                            <svg id="personalityPieChart" viewBox="0 0 100 100" class="w-full h-auto"></svg>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Add more project sections as needed -->
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 John Riley. All rights reserved.</p>
-        <!-- Add any footer content or links here -->
-    </footer>
+            <!-- Right Column -->
+            <div class="col-span-3 bg-white rounded-lg shadow-md">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-4">Right Column</h2>
+                    <p>This is the content of the right column.</p>
+                    <p>It occupies 75% of the total width.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>
+
+<script src="personality.js"></script>
+
+<script>
+    var mugTooltip = "Hello! I'm John Riley. Here's my story.  I have over 30 years of professional experience for you to explore. Navigate, hover, and click to see extended details.  You can always export the (boring) PDF copy if necessary";
+
+    // Define an array of certifications with their titles and image paths
+    var certifications = [
+        { title: "Professional Scrum Trainer", image: "PST.svg" },
+        { title: "Certification 2", image: "cert2.png" },
+        { title: "Certification 3", image: "cert3.png" },
+    ];
+
+    // Get the certifications list element
+    var certificationsList = document.getElementById("certificationsList");
+
+    // Set tooltip text dynamically using JavaScript
+    document.getElementById("profileImage").title = mugTooltip;
+
+    // Populate the certifications list dynamically
+    certifications.forEach(function(certification) {
+        // Create list item
+        var listItem = document.createElement("li");
+        listItem.classList.add("flex", "items-center", "mb-2");
+
+        // Create image element
+        var image = document.createElement("img");
+        image.src = certification.image;
+        image.alt = certification.title;
+        image.classList.add("w-8", "h-8", "mr-2");
+
+        // Create title element
+        var title = document.createElement("span");
+        title.textContent = certification.title;
+
+        // Append image and title to list item
+        listItem.appendChild(image);
+        listItem.appendChild(title);
+
+        // Append list item to certifications list
+        certificationsList.appendChild(listItem);
+    });
+</script>
