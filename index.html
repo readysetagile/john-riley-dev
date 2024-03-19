@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two-Column Resume - Tailwind</title>
+    <title>Resume for John Riley</title>
     <!-- Include the Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Custom style sheet -->
@@ -14,6 +14,8 @@
     </style>
     <!-- Include D3.js from a CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Include the WordCloud library -->
+    <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -55,10 +57,23 @@
             </div>
             <!-- Right Column -->
             <div class="col-span-3 bg-white rounded-lg shadow-md">
-                <div class="p-6">
-                    <h2 class="text-2xl font-bold mb-4">Right Column</h2>
-                    <p>This is the content of the right column.</p>
-                    <p>It occupies 75% of the total width.</p>
+                <div class="grid grid-rows-3">
+                    <!-- Section 1 -->
+                    <div class="p-2 section-highlight">
+                        <h2 class="text-xl font-bold mb-4">Section 1</h2>
+                        <p>This is the content of section 1.</p>
+                    </div>
+                    <!-- Section 2 -->
+                    <div class="p-2 section-highlight">
+                        <h2 class="text-xl font-bold mb-4">Proficiencies</h2>
+                            <!-- Word cloud container -->
+                            <div id="wordcloud" width="800" length="800"></div>
+                    </div>
+                    <!-- Section 3 -->
+                    <div class="p-2 section-highlight">
+                        <h2 class="text-xl font-bold mb-4">Section 3</h2>
+                        <p>This is the content of section 3.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,45 +82,6 @@
 
 </html>
 
+<script src="hero-section.js"></script>
 <script src="personality.js"></script>
-
-<script>
-    var mugTooltip = "Hello! I'm John Riley. Here's my story.  I have over 30 years of professional experience for you to explore. Navigate, hover, and click to see extended details.  You can always export the (boring) PDF copy if necessary";
-
-    // Define an array of certifications with their titles and image paths
-    var certifications = [
-        { title: "Professional Scrum Trainer", image: "PST.svg" },
-        { title: "Certification 2", image: "cert2.png" },
-        { title: "Certification 3", image: "cert3.png" },
-    ];
-
-    // Get the certifications list element
-    var certificationsList = document.getElementById("certificationsList");
-
-    // Set tooltip text dynamically using JavaScript
-    document.getElementById("profileImage").title = mugTooltip;
-
-    // Populate the certifications list dynamically
-    certifications.forEach(function(certification) {
-        // Create list item
-        var listItem = document.createElement("li");
-        listItem.classList.add("flex", "items-center", "mb-2");
-
-        // Create image element
-        var image = document.createElement("img");
-        image.src = certification.image;
-        image.alt = certification.title;
-        image.classList.add("w-8", "h-8", "mr-2");
-
-        // Create title element
-        var title = document.createElement("span");
-        title.textContent = certification.title;
-
-        // Append image and title to list item
-        listItem.appendChild(image);
-        listItem.appendChild(title);
-
-        // Append list item to certifications list
-        certificationsList.appendChild(listItem);
-    });
-</script>
+<script src="proficiencies.js"></script>

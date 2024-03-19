@@ -5,3 +5,35 @@
 #personalityPieChart {
     max-width: 100%; /* Ensure the SVG scales properly */
 }
+
+.tooltip {
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.right-side-header {
+    font-family: Garamond; 
+    font-size: 24px; 
+    line-height: 28px; 
+    color: rgb(51, 51, 51); 
+    font-weight: bold; 
+    font-style: normal; 
+    text-decoration: underline; 
+    user-select: text;
+}
+
+.section-highlight {
+    background-color: rgb(243, 250, 249);
+}
+
+.section-highlight p {
+    background-color: white;
+}
+
+#wordcloud {
+    width: 800px;
+    height: 800px;
+}
