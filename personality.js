@@ -12,17 +12,20 @@ var headSVG = '<?xml version="1.0" encoding="utf-8"?>' +
 
 // Define personality traits and their corresponding percentages
 var personalityTraits = [
-    { trait: "Futuristic", percentage: 15, color: "#ff7e67" },
-    { trait: "Adaptability", percentage: 15, color: "#EDC948" },
-    { trait: "Responsiblity", percentage: 20, color: "#76B7B2" },
-    { trait: "Restorative", percentage: 20, color: "#59A14F" },
-    { trait: "Woo", percentage: 5, color: "#F28E2B" },
-    { trait: "Activator", percentage: 25, color: "#6cb2eb" }
+    { trait: "Futuristic", percentage: 15, color: "#ff7e67", description: "People exceptionally talented in the Futuristic theme are inspired by the future and what could be. They energize others with their visions of the future. “Wouldn't it be great if ... ” You are the kind of person who loves to peer over the horizon. The future fascinates you."},
+    { trait: "Adaptability", percentage: 15, color: "#EDC948", description: "People exceptionally talented in the Adaptability theme prefer to go with the flow. They tend to be now people who take things as they come and discover the future one day at a time. You live in the moment. You don't see the future as a fixed destination. Instead, you see it as a place that you create out of the choices that you make right now."},
+    { trait: "Responsiblity", percentage: 20, color: "#76B7B2", description: "People exceptionally talented in the Responsibility theme take psychological ownership of what they say they will do. They are committed to stable values such as honesty and loyalty. Your Responsibility theme forces you to take psychological ownership for anything you commit to, and whether large or small, you feel emotionally bound to follow it through to completion. Your good name depends on it."},
+    { trait: "Restorative", percentage: 20, color: "#59A14F", description: "People exceptionally talented in the Restorative theme are adept at dealing with problems. They are good at figuring out what is wrong and resolving it."},
+    { trait: "Woo", percentage: 5, color: "#F28E2B", description: "People exceptionally talented in the Woo theme love the challenge of meeting new people and winning them over. They derive satisfaction from breaking the ice and making a connection with someone. Woo stands for winning others over. You enjoy the challenge of meeting new people and getting them to like you. Strangers are rarely intimidating to you."},
+    { trait: "Activator", percentage: 25, color: "#6cb2eb", description: "People with the strength of Activator are the ones who make things happen. One of their most recognizable behaviors is the ability to turn thoughts, ideas and concepts into action. In fact, the strength of Activator can be best described or characterized as action. These people are in action, usually an action that you can see – tapping a pen on the table, tapping the screen of their phone, tapping you on the shoulder and asking, “What are you doing? What’s going on?”" }
     // Add more traits as needed
 ];
 
 // Get SVG container
 var svg = document.getElementById("personalityPieChart");
+
+//get the tooltip element from the page
+var tooltipElement = document.getElementById('personality-tooltip');
 
 // Set the dimensions and radius of the pie chart
 var width = svg.clientWidth / 6;
@@ -59,26 +62,21 @@ arcs.append("path")
     .attr("fill", function(d) { return d.data.color; })
     // Add tooltip on mouseover
     .on("mouseover", function(event, d) {
-        var tooltip = d3.select("#personalityPieChart")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("position", "absolute")
-            .style("background-color", "white")
-            .style("padding", "5px")
-            .style("border", "1px solid black")
-            .style("border-radius", "5px")
-            .style("pointer-events", "none"); // Ensure tooltip doesn't interfere with mouse events
-        tooltip.html(d.data.trait); // Set tooltip content
+        //set the tooltip text
+        const ttText = '<b>' + d.data.trait + '</b><br><b>My percentage:</b> ' + d.data.percentage + '%<br><b>Description:</b> ' + d.data.description;
+
+        tooltipElement.innerHTML = ttText;
+        // Show tooltip
+        tooltipElement.style.display = 'block';
 
         // Position tooltip relative to mouse pointer
-        var x = event.pageX + 10;
-        var y = event.pageY + 10;
-        tooltip.style("left", x + "px")
-               .style("top", y + "px");
+        tooltipElement.style.left = (event.pageX + 10) + 'px'; 
+        tooltipElement.style.top = (event.pageY) + 'px'; 
     })
+
     .on("mouseout", function() {
         // Remove tooltip on mouseout
-        d3.select(".tooltip").remove();
+        tooltipElement.style.display = 'none';
     });
 
 // Append a white circle to cover the inner part of the pie chart

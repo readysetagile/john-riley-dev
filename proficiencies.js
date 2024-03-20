@@ -43,14 +43,73 @@ var proficiencies = [
 
 // Get the container for the word cloud
 const wordCloudContainer = document.getElementById('wordcloud');
+// Get the container for the left side
+const leftSideContainer = document.getElementById('leftSideContainer');
+// Calculate the height of the left side
+const leftSideHeight = leftSideContainer.clientHeight;
+
+// Set the height of the word cloud section to one third of the height of the left side
+wordCloudContainer.style.height = `${leftSideHeight / 3}px`;
 
 // Prepare data for the word cloud
-const wordCloudData = proficiencies.map(proficiency => [proficiency.description, proficiency.proficiency * 10]);
+const wordCloudData = proficiencies.map(proficiency => [proficiency.description, proficiency.proficiency * 5]);
 
+const getColorForWord = (word, weight, fontSize, distance, theta) => {
+    const proficiency = proficiencies.find(item => item.description === word);
+    if (proficiency) {
+        switch (proficiency.category) {
+            case 'Roles':
+                return 'aqua';
+            case 'Programming Language':
+                return 'red';
+            case 'Principles':
+                return 'orange';
+            case 'Cloud Tech':
+                return 'blue';
+            default:
+                return 'black';            
+        }
+    } else {
+        // Return a default color if the word is not found
+        return 'black'; // or any other default color
+    }
+};
+
+
+const displayTooltip = (item, dimension, event) => {
+    //get the proficiency
+    if (!item) return;
+    
+    const proficiency = proficiencies.find(term => term.description === item[0]);
+
+    //set the tooltip text
+    const ttText = '<b>' + proficiency.description + '</b><br><b>Category:</b> ' + proficiency.category + '<br><b>Proficiency:</b> ' + proficiency.proficiency + '<br><b>Justification:</b> ' + proficiency.justification;
+
+    const tooltipElement = document.getElementById('wordcloud-tooltip');
+    tooltipElement.innerHTML = ttText;
+
+    // Position tooltip at cursor
+    tooltipElement.style.left = (event.pageX + 10) + 'px'; 
+    tooltipElement.style.top = (event.pageY) + 'px'; 
+
+    // Ensure tooltip is on top of other elements
+    tooltipElement.style.zIndex = 9999;
+
+    // Show tooltip
+    tooltipElement.style.display = 'block';
+
+    // define the event when the mouse leaves this area
+    event.target.addEventListener('mouseout', () => {
+        // Hide tooltip
+        tooltipElement.style.display = 'none';
+});}
 
 // Generate the word cloud
 WordCloud(wordCloudContainer, {
-   list: wordCloudData
+   list: wordCloudData, 
+   fontFamily: "Arial",
+   color: getColorForWord, 
+   hover: displayTooltip
 });
 
 // WordCloud(wordCloudContainer, {
