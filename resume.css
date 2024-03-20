@@ -29,10 +29,36 @@
     background-color: rgb(243, 250, 249);
 }
 
-.section-highlight p {
+.section-detail {
     background-color: white;
 }
 
 #wordcloud {
     width: 100%;
 }
+
+#experience-chart {
+    width: 100%;
+  }
+  
+  .bar {
+    fill: steelblue; /* Color of the bars */
+  }
+  
+  .bar-label {
+    font-size: 12px; /* Font size of the labels */
+    fill: black; /* Color of the labels */
+  }
+  
+  .axis text {
+    font-size: 12px; /* Font size of the axis labels */
+    font-family: arial;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000; /* Color of the axis lines */
+    shape-rendering: crispEdges;
+  }
+  
