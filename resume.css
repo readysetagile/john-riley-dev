@@ -62,3 +62,25 @@
     shape-rendering: crispEdges;
   }
   
+  /* Container for the public speaking grid */
+  #public-speaking-grid {
+    height: 33vh; /* 33% of the viewport height */
+    overflow-y: auto; /* Add vertical scrollbar when necessary */
+  }
+
+ /* Add CSS for styling the speaking engagements grid */
+.speaking-engagements {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow-y: auto; /* Enable vertical scrollbar if needed */
+  max-height: 33vh; /* Set maximum height to 33% of viewport height */
+}
+
+.speaking-engagement {
+  width: calc(100% / 4); /* Initially display 4 engagements per row */
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
