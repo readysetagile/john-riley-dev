@@ -6,6 +6,9 @@ The inspiration of this project was created from a meetup idea from the communit
 
 ### Technologies Used
 
+#### TailWind used to build visually appealing pages quickly
+[Tailwind CSS](https://tailwindcss.com/) is a package of CSS files and a command-line interface to quickly build and create or convert visually appealing web pages.
+ 
 #### D3.js for Data Visualization
 
 [D3.js](https://d3js.org/) (Data-Driven Documents) is a JavaScript library for manipulating documents based on data. It's commonly used for creating interactive and dynamic data visualizations in web browsers. In this portfolio:

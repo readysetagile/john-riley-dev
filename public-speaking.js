@@ -1,5 +1,59 @@
 // Sample data for public speaking engagements
 const speakingEngagements = [
+{
+      date: "2026-09-23",
+      location: "Upper Arlington, OH",
+      title: "Columbus Women in Agile AI Learning Circle (host)",
+      venue: "Ready Set Agile / COhatch"
+    },
+    {
+      date: "2026-08-04",
+      location: "Columbus, OH",
+      title: "Agile Practices & Continuous Learning Workshop (host)",
+      venue: "World Class Title"
+    },
+    {
+      date: "2026-03-06",
+      location: "Columbus, OH",
+      title: "Charting Your Path to be the Best Business Analyst",
+      venue: "BACon 2026 (IIBA Regional Conference)"
+    },
+    {
+      date: "2025-08-27",
+      location: "Columbus, OH",
+      title: "Navigating IIBA Professional Certifications: A Personal Journey",
+      venue: "IIBA Columbus Chapter"
+    },
+    {
+      date: "2020-04-28",
+      location: "Columbus, OH",
+      title: "Play With Docker Workshop",
+      venue: "(Virtual Venue)"
+    },
+    {
+      date: "2026-09-23",
+      location: "Upper Arlington, OH",
+      title: "Women in Agile AI Learning Circle",
+      venue: "Ready Set Agile / COhatch"
+    },
+    {
+      date: "2026-08-04",
+      location: "Columbus, OH",
+      title: "Agile Practices & Continuous Learning Workshop",
+      venue: "World Class Title"
+    },
+    {
+      date: "2025-08-27",
+      location: "Columbus, OH",
+      title: "Charting Your Path: Professional Development & Career Readiness",
+      venue: "IIBA Columbus Chapter"
+    },
+    {
+      date: "2020-04-28",
+      location: "Columbus, OH",
+      title: "Play With Docker Workshop",
+      venue: "(Virtual Venue)"
+    },
     {
       date: "2017-08-10",
       location: "Orlando, FL",

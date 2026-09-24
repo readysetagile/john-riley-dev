@@ -2,9 +2,8 @@ const reversedExperienceData = [
     {
       company: "Ready Set Agile, LLC:",
       startYear: 2017,
-      duties: "• Created and delivered customized foundation Agile training solutions for corporations using the Training From The Back of The Room (TFTBOTR) style<br>• Coached associates with agile software delivery techniques in all agile roles",
-      //endYear: 0,
-      position: "Principal Agile Coach & Trainer"
+      duties: "• Founded Ready Set Agile (accredited by Ohio State Board of Career Colleges and Schools) and NextGenTalent Lab.<br>• Delivered custom Agile, Generative AI, and Scrum.org training for clients including MIT Lincoln Laboratory, Worthington Steel, Bread Financial, World Class Title, and Mavon Insurance.<br>• Partnered with local high schools (e.g., Whitehall-Yearling) to deliver grant-funded Applying Professional Scrum (APS) student workforce certifications.<br>• Enterprise coaching using Evidence-Based Management (EBM), DORA metrics, and Training From The Back of The Room (TFTBOTR) methodologies.",
+      position: "Founder, Principal Agile Coach & PST"
     },
     {
       company: "Safelite Auto Glass",
@@ -78,7 +77,7 @@ const reversedExperienceData = [
     }
   ]
   
-// i messed up and got lazy.  reverse the order of the array so that the last job I worked is at the bottom
+// reverse the order of the array so that the latest job is at the top/bottom as intended by D3 layout
 const experienceData = reversedExperienceData.reverse();
 
 //get the tooltip element from the page
@@ -98,11 +97,9 @@ function createBarChart(data) {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   
-    // Create scales
+    // Create scales (Updated domain upper bound to 2026)
     const x = d3.scaleLinear()
-      //.domain([d3.min(data, d => d.startYear), d3.max(data, d => d.endYear)])
-      //.domain([d3.max(data, d => d.endYear), d3.min(data, d => d.startYear)])
-      .domain([2024, d3.min(data, d => d.startYear) - 1])
+      .domain([2026, d3.min(data, d => d.startYear) - 1])
       .range([0, width]);
   
     const y = d3.scaleBand()
@@ -115,64 +112,42 @@ function createBarChart(data) {
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x)
         .tickFormat(d3.format("d"))
-        //.tickValues(d3.range(d3.max(data, d => d.endYear), d3.min(data, d => d.startYear) - 1, -2)) // Label every 2 years in reverse order
-        .tickValues(d3.range(2024, d3.min(data, d => d.startYear -1 ), -5)) // Label every 2 years in reverse order
-        .tickPadding(10) // Add padding between ticks and axis
+        .tickValues(d3.range(2026, d3.min(data, d => d.startYear - 1), -5))
+        .tickPadding(10)
     );
 
     // Create y-axis
     const yAxis = svg.append("g")
       .call(d3.axisLeft(y))
       .selectAll("text")
-      .style("text-anchor", "end") // Adjust text-anchor to end for right-justification
+      .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em");
   
-    // Create y-axis label
-    svg.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", -margin.left)
-      .attr("x", -height / 2)
-      .attr("dy", "1em")
-      .style("text-anchor", "end")
-      //.text("Company");
-  
-      
     // Create bars
     svg.selectAll(".bar")
       .data(data)
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", d => x(d.endYear))
+      .attr("x", d => x(d.endYear ? d.endYear : 2026))
       .attr("y", d => y(d.company))
-      .attr("width", d => x(d.startYear) - x(d.endYear ? d.endYear : new Date().getFullYear()))  // no endYear = present
+      .attr("width", d => x(d.startYear) - x(d.endYear ? d.endYear : 2026))
       .attr("height", y.bandwidth())
       .attr("fill", "steelblue")
-      // Add tooltip on mouseover
       .on("mouseover", function(event, d) {
-        //set the tooltip text
-        const ttText = '<b>' + d.company + '</b>&nbsp;[' + d.position + '] : ' + d.startYear + '-' + (d.endYear ? d.endYear : "") + '<br>' + d.duties;
+        const ttText = '<b>' + d.company + '</b>&nbsp;[' + d.position + '] : ' + d.startYear + '-' + (d.endYear ? d.endYear : "Present") + '<br>' + d.duties;
 
         tooltipElement.innerHTML = ttText;
-        // Show tooltip
         tooltipElement.style.display = 'block';
-
-        // Position tooltip relative to mouse pointer
         tooltipElement.style.left = (event.pageX + 10) + 'px'; 
         tooltipElement.style.top = (event.pageY) + 'px'; 
     })
-
     .on("mouseout", function() {
-        // Remove tooltip on mouseout
         tooltipElement.style.display = 'none';
     });
 
-    // Remove label for the position
     svg.selectAll(".bar-label").remove();
-  }
+}
           
-  
-  // Call the function with sample data
-  createBarChart(experienceData);
-  
+createBarChart(experienceData);
