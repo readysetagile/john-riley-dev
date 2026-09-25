@@ -13,6 +13,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Include the WordCloud library -->
     <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -53,6 +54,10 @@
                             <svg id="personalityPieChart" viewBox="0 0 100 100" class="w-full h-auto"></svg>
                         </div>
                     </div>
+                    <button onclick="document.getElementById('jdModal').classList.remove('hidden')" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow mt-4 w-full">
+                    Boring Paper copy
+                    </button>                        
                 </div>
             </div>
             <!-- Right Column -->
@@ -78,6 +83,32 @@
             </div>
         </div>
     </div>
+    <!-- Input Modal -->
+    <div id="jdModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg max-w-lg w-full shadow-2xl">
+        <h3 class="text-lg font-bold mb-2">Paste Job Description</h3>
+        <p class="text-xs text-gray-600 mb-4">Paste the target JD below. The engine will match keywords against my experience to generate a tailored resume.</p>
+        <textarea id="jdInput" rows="8" class="w-full border p-2 text-xs rounded mb-4" placeholder="Paste job requirements, skills, or job posting text here..."></textarea>
+        <div class="flex justify-end gap-2">
+        <button onclick="document.getElementById('jdModal').classList.add('hidden')" class="px-4 py-2 text-xs border rounded">Cancel</button>
+        <button onclick="document.getElementById('jdModal').classList.add('hidden'); generateTailoredResume();" class="px-4 py-2 text-xs bg-blue-600 text-white rounded">Generate</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Output Preview & PDF Download Modal -->
+    <div id="generatorModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-gray-200 p-4 rounded-t-lg max-w-4xl w-full flex justify-between items-center">
+        <span class="font-bold text-gray-800">Tailored Resume Preview</span>
+        <div class="flex gap-2">
+        <button onclick="downloadPDF()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs rounded font-bold">📥 Download PDF</button>
+        <button onclick="closeModal()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-xs rounded font-bold">Close</button>
+        </div>
+    </div>
+    <div id="resumePreview" class="max-w-4xl w-full max-h-[80vh] overflow-y-auto"></div>
+    </div>
+
+    <script src="resume-generator.js"></script>
 </body>
 
 </html>

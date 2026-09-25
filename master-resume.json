@@ -1,0 +1,75 @@
+{
+  "basics": {
+    "name": "John Riley",
+    "title": "Principal Agile Coach & Professional Scrum Trainer (PST)",
+    "email": "john@readysetagile.com",
+    "website": "https://johnriley.dev",
+    "location": "Columbus, OH",
+    "summary": "Passionate Agile Trainer, Part-time Technologist, and Professional Learner with 30+ years of software delivery, manufacturing operations, and organizational transformation experience."
+  },
+  "experiences": [
+    {
+      "id": "rsa",
+      "company": "Ready Set Agile, LLC",
+      "position": "Founder, Principal Agile Coach & PST",
+      "startYear": 2017,
+      "endYear": null,
+      "bullets": [
+        { "id": "rsa-1", "text": "Founded Ready Set Agile and secured official state accreditation with the Ohio State Board of Career Colleges and Schools.", "tags": ["agile", "leadership", "scrum", "accreditation", "training"] },
+        { "id": "rsa-2", "text": "Designed and delivered Scrum.org courseware (APS, PSPO AI Essentials) and custom Agile & Generative AI training for clients including MIT Lincoln Laboratory, Worthington Steel, and World Class Title.", "tags": ["scrum", "ai", "generative ai", "training", "pst", "coaching", "developer"] },
+        { "id": "rsa-3", "text": "Founded NextGenTalent Lab to deliver workforce readiness programs and grant-funded Applying Professional Scrum (APS) credentials to high school students.", "tags": ["workforce", "scrum", "training", "leadership", "youth"] },
+        { "id": "rsa-4", "text": "Coached enterprise teams using Evidence-Based Management (EBM), DORA metrics, and Training From The Back of The Room (TFTBOTR) techniques.", "tags": ["coaching", "metrics", "ebm", "dora", "agile", "tftbotr"] }
+      ]
+    },
+    {
+      "id": "safelite",
+      "company": "Safelite Auto Glass",
+      "position": "Scrum Master",
+      "startYear": 2016,
+      "endYear": 2017,
+      "bullets": [
+        { "id": "safe-1", "text": "Scrum Master for teams of ~40 members across contact center, claims, and supply products.", "tags": ["scrum master", "scrum", "leadership", "agile"] },
+        { "id": "safe-2", "text": "Delivered two-day Agile foundations courses across 16 sessions to ~200 members.", "tags": ["training", "agile", "coaching"] },
+        { "id": "safe-3", "text": "Coached PMO and portfolio management teams on scaled agile product development.", "tags": ["scaled agile", "pmo", "portfolio", "coaching"] }
+      ]
+    },
+    {
+      "id": "aep",
+      "company": "American Electric Power",
+      "position": "Agile Consultant / Scrum Master",
+      "startYear": 2013,
+      "endYear": 2016,
+      "bullets": [
+        { "id": "aep-1", "text": "Served as Scrum Master for the company's largest Agile initiative ($500K+ projects).", "tags": ["scrum master", "scrum", "agile", "pmo"] },
+        { "id": "aep-2", "text": "Established working group for advanced technical practices including Acceptance Test Driven Development (ATDD) and automated testing.", "tags": ["atdd", "testing", "automation", "engineering"] }
+      ]
+    },
+    {
+      "id": "emerson",
+      "company": "Emerson Network Power",
+      "position": "Principal Architect",
+      "startYear": 2006,
+      "endYear": 2012,
+      "bullets": [
+        { "id": "emerson-1", "text": "Architected real-time hardware simulator and automated shop floor inventory systems using Lean Six Sigma principles.", "tags": ["architecture", "lean", "six sigma", "automation"] },
+        { "id": "emerson-2", "text": "Introduced eCommerce department to Agile software development methodologies and Scrum framework.", "tags": ["agile", "scrum", "ecommerce", "architecture"] }
+      ]
+    }
+  ],
+  "speaking": [
+    { "id": "spk-1", "date": "2026-09-23", "title": "Women in Agile AI Learning Circle", "venue": "Ready Set Agile / COhatch", "tags": ["ai", "agile", "learning"] },
+    { "id": "spk-2", "date": "2026-08-04", "title": "Agile Practices & Continuous Learning Workshop", "venue": "World Class Title", "tags": ["agile", "workshop", "coaching"] },
+    { "id": "spk-3", "date": "2026-03-06", "title": "Charting Your Path to be the Best Business Analyst", "venue": "BACon 2026 (IIBA Regional Conference)", "tags": ["business analysis", "iiba", "babok", "career"] },
+    { "id": "spk-4", "date": "2025-08-27", "title": "Navigating IIBA Professional Certifications: A Personal Journey", "venue": "IIBA Columbus Chapter", "tags": ["iiba", "certifications", "business analysis"] },
+    { "id": "spk-5", "date": "2018-10-10", "title": "How To Write A Recipe For Automated Testing", "venue": "Columbus IIBA / Improving", "tags": ["testing", "automation", "iiba"] }
+  ],
+  "proficiencies": [
+    { "name": "Agile Coaching & Scrum", "category": "Roles", "proficiency": 9, "tags": ["agile", "scrum", "coaching", "pst"] },
+    { "name": "Business Analysis (BABOK)", "category": "Principles", "proficiency": 8, "tags": ["business analysis", "iiba", "babok", "requirements"] },
+    { "name": "Test-First & ATDD", "category": "Principles", "proficiency": 9, "tags": ["testing", "atdd", "automation", "quality"] },
+    { "name": "Generative AI Integration", "category": "Principles", "proficiency": 8, "tags": ["ai", "generative ai", "pydantic", "automation"] },
+    { "name": "Docker & Containerization", "category": "Cloud Tech", "proficiency": 8, "tags": ["docker", "devops", "containers"] },
+    { "name": "GitHub Actions / CI-CD", "category": "Cloud Tech", "proficiency": 8, "tags": ["ci/cd", "github actions", "devops", "git"] },
+    { "name": "C# / .NET", "category": "Programming Language", "proficiency": 8, "tags": ["c#", ".net", "backend", "software architecture"] }
+  ]
+}
