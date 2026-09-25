@@ -15,7 +15,10 @@ let masterData = null;
 // Pre-load Master Data for local keyword matching engine
 fetch('master-resume.json')
   .then(res => res.json())
-  .then(data => { masterData = data; })
+  .then(data => { 
+    masterData = data; 
+    window.masterResumeData = data; // Assign to window object
+  })
   .catch(err => console.error("Error loading master resume data:", err));
 
 // Hide or remove the button completely on production (johnriley.dev)
@@ -26,6 +29,53 @@ document.addEventListener('DOMContentLoaded', () => {
   if (aiBtn && !IS_LOCAL) {
     // Hide or remove the button completely on production (johnriley.dev)
     aiBtn.style.display = 'none';
+  }
+});
+
+function renderAIPreview(data) {
+  // Save active dataset globally for DOCX export
+  window.currentTailoredResume = data;
+
+  const previewDiv = document.getElementById('resumePreview');
+  // ... rest of renderAIPreview code ...
+}
+
+// docx generator
+document.addEventListener('DOMContentLoaded', () => {
+  const docxBtn = document.getElementById('downloadDocxBtn');
+
+  if (docxBtn) {
+    docxBtn.addEventListener('click', () => {
+      const dataToExport = window.currentTailoredResume || window.masterResumeData;
+
+      if (!dataToExport) {
+        alert("No resume data available to export.");
+        return;
+      }
+
+      // Format master data if raw masterResumeData is used directly
+      let formatted = dataToExport;
+      if (!dataToExport.summary && dataToExport.basics) {
+        formatted = {
+          summary: dataToExport.basics.summary,
+          experiences: dataToExport.experiences.map(exp => ({
+            company: exp.company,
+            position: exp.position,
+            startYear: exp.startYear,
+            endYear: exp.endYear,
+            bullets: exp.bullets.slice(0, 3).map(b => typeof b === 'string' ? b : b.text)
+          })),
+          proficiencies: dataToExport.proficiencies.slice(0, 6).map(p => typeof p === 'string' ? p : p.name),
+          speaking: dataToExport.speaking.slice(0, 3).map(s => ({
+            title: s.title,
+            venue: s.venue,
+            year: s.date ? s.date.split('-')[0] : '2026'
+          }))
+        };
+      }
+
+      downloadDOCX(formatted);
+    });
   }
 });
 
@@ -245,3 +295,92 @@ function closeModal() {
   document.getElementById('generatorModal').classList.add('hidden');
 }
 
+function downloadDOCX(data) {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = docx;
+
+  const doc = new Document({
+    sections: [{
+      properties: {
+        page: {
+          margin: { top: 720, bottom: 720, left: 720, right: 720 } // 0.5 in margins
+        }
+      },
+      children: [
+        // Header
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({ text: "John Riley", bold: true, size: 32, font: "Arial" }),
+          ]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({ text: "Principal Agile Coach & Professional Scrum Trainer (PST)", bold: true, color: "1D4ED8", size: 22, font: "Arial" }),
+          ]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+          border: { bottom: { color: "1D4ED8", space: 4, value: BorderStyle.SINGLE, size: 12 } },
+          children: [
+            new TextRun({ text: "Columbus, OH | john@readysetagile.com | https://johnriley.dev", size: 18, color: "4B5563", font: "Arial" }),
+          ]
+        }),
+
+        // Professional Profile
+        new Paragraph({
+          text: "PROFESSIONAL PROFILE",
+          heading: HeadingLevel.HEADING_2,
+          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 150, after: 100 }
+        }),
+        new Paragraph({
+          text: data.summary,
+          spacing: { after: 200 }
+        }),
+
+        // Relevant Experience
+        new Paragraph({
+          text: "RELEVANT EXPERIENCE",
+          heading: HeadingLevel.HEADING_2,
+          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 150, after: 100 }
+        }),
+        ...data.experiences.flatMap(exp => [
+          new Paragraph({
+            children: [
+              new TextRun({ text: exp.position, bold: true, size: 20 }),
+              new TextRun({ text: ` @ ${exp.company}`, bold: true, color: "1D4ED8", size: 20 }),
+              new TextRun({ text: `\t${exp.startYear} - ${exp.endYear || 'Present'}`, color: "6B7280", size: 18 })
+            ]
+          }),
+          ...exp.bullets.map(b => new Paragraph({
+            text: b,
+            bullet: { level: 0 }
+          }))
+        ]),
+
+        // Key Proficiencies (Pills / Badges in Word)
+        new Paragraph({
+          text: "KEY PROFICIENCIES",
+          heading: HeadingLevel.HEADING_2,
+          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 200, after: 100 }
+        }),
+        new Paragraph({
+          children: data.proficiencies.map(skill => new TextRun({
+            text: `  ${skill}  `,
+            shading: { fill: "F3F4F6" },
+            font: "Arial",
+            size: 18
+          })).reduce((prev, curr) => [...prev, curr, new TextRun({ text: "  " })], [])
+        })
+      ]
+    }]
+  });
+
+  Packer.toBlob(doc).then(blob => {
+    saveAs(blob, "John_Riley_Resume.docx");
+  });
+}
