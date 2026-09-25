@@ -31,8 +31,8 @@
                             <span class="font-normal">Resume for </span>
                             <span class="text-xl font-bold mb-6">John Riley</span>
                         </h2>
-                        <!-- Add the image here -->
-                        <img id="profileImage" src="jr-mug.png" alt="John Riley's Picture" class="w-full max-w-xs mx-auto rounded-full mb-4">
+                        <img id="profileImage" src="img/jr-mug-2024.png" alt="John Riley" class="profile-mug" />
+                        <!-- <img id="profileImage" src="img/jr-mug.png" alt="John Riley's Picture" class="w-full max-w-xs mx-auto rounded-full mb-4"> -->
                         <p>Passionate Trainer, Part-time Technologist, Professional Learner</p>
                     </div>
                     <!-- Certifications -->
@@ -85,15 +85,16 @@
     </div>
     <!-- Input Modal -->
     <div id="jdModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg max-w-lg w-full shadow-2xl">
-        <h3 class="text-lg font-bold mb-2">Paste Job Description</h3>
-        <p class="text-xs text-gray-600 mb-4">Paste the target JD below. The engine will match keywords against my experience to generate a tailored resume.</p>
-        <textarea id="jdInput" rows="8" class="w-full border p-2 text-xs rounded mb-4" placeholder="Paste job requirements, skills, or job posting text here..."></textarea>
-        <div class="flex justify-end gap-2">
-        <button onclick="document.getElementById('jdModal').classList.add('hidden')" class="px-4 py-2 text-xs border rounded">Cancel</button>
-        <button onclick="document.getElementById('jdModal').classList.add('hidden'); generateTailoredResume();" class="px-4 py-2 text-xs bg-blue-600 text-white rounded">Generate</button>
+        <div class="bg-white p-6 rounded-lg max-w-lg w-full shadow-2xl">
+            <h3 class="text-lg font-bold mb-2">Paste Job Description</h3>
+            <p class="text-xs text-gray-600 mb-4">Paste the target JD below. The engine will match keywords against my experience to generate a tailored resume.</p>
+            <textarea id="jdInput" rows="8" class="w-full border p-2 text-xs rounded mb-4" placeholder="Paste job requirements, skills, or job posting text here..."></textarea>
+            <div class="flex justify-end gap-2">
+            <button onclick="document.getElementById('jdModal').classList.add('hidden')" class="px-4 py-2 text-xs border rounded">Cancel</button>
+            <button onclick="document.getElementById('jdModal').classList.add('hidden'); generateTailoredResume();" class="px-4 py-2 text-xs bg-blue-600 text-white rounded">Generate</button>
+            <button id="generateBtn" onclick="generateAITailoredResume()" class="px-4 py-2 text-xs bg-blue-600 text-white rounded font-bold hover:bg-blue-700"> AI Res </button>
+            </div>
         </div>
-    </div>
     </div>
 
     <!-- Output Preview & PDF Download Modal -->
@@ -118,3 +119,4 @@
 <script src="professional-expereince.js"></script>
 <script src="proficiencies.js"></script>
 <script src="public-speaking.js"></script>
+

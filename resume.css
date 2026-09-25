@@ -84,3 +84,38 @@
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+}
+
+.pdf-page {
+  box-sizing: border-box;
+  width: 8.5in;
+  min-height: 11in;
+  max-height: 11in; /* Strict single-page letter height */
+  padding: 0.4in 0.5in; /* Slightly tighter padding */
+  font-size: 11px; /* Slightly tighter base text */
+  line-height: 1.35;
+  background-color: #ffffff;
+  overflow: hidden; /* Prevents overflow pushing to page 2 */
+}
+
+/* Prevent html2pdf from breaking inside experience blocks */
+.pdf-block {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+#profileImage {
+  width: 250px;                 /* Adjust diameter as needed */
+  height: 250px;                /* Must match width for a perfect circle */
+  border-radius: 50%;           /* Clips image into a circular frame */
+  object-fit: cover;            /* Centers and crops the photo inside */
+  border: 14px solid #4A7BA7;   /* Matching blue ring color & thickness */
+  box-sizing: border-box;
+}

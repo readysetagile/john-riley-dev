@@ -1,10 +1,19 @@
 var mugTooltip = "Hello! I'm John Riley. Here's my story.  I have over 30 years of professional experience for you to explore. Navigate, hover, and click to see extended details.  You can always export the (boring) PDF copy if necessary";
 
 // Define an array of certifications with their titles and image paths
+
 var certifications = [
-    { title: "Professional Scrum Trainer", image: "PST.svg" },
-    { title: "Certification 2", image: "cert2.png" },
-    { title: "Certification 3", image: "cert3.png" },
+    { title: "Professional Scrum Trainer", image: "img/PST.svg" },
+    { title: "Professional Agile Leadership - Evidence-Based Management", image: "img/PAL-EBM.svg" },
+    { title: "Professional Agile Leadership I", image: "img/PAL-I.svg" },
+    { title: "Professional Scrum Product Owner III", image: "img/PSPO-III.svg" },
+    { title: "Professional Scrum Product Owner - AI Essentials", image: "img/PSPO-AI-Essentials-Cert-Badge.svg" },
+    { title: "Scaled Professional Scrum", image: "img/SPS.svg" },
+    { title: "Professional Product Discovery & Validation", image: "img/PPDV.svg" },
+    { title: "Professional Scrum Developer I", image: "img/PSD-I.svg" },
+    { title: "Professional Scrum with Kanban I", image: "img/PSK-I.svg" },
+    { title: "Professional Scrum Master", image: "img/PSM-II.svg" },
+    { title: "Professional Scrum Master - AI Essentials", image: "img/PSM-AIE.svg" },
 ];
 
 // Get the certifications list element
