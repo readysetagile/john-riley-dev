@@ -22,6 +22,19 @@
       ]
     },
     {
+      "id": "devops-telemetry",
+      "company": "Ready Set Agile, LLC - Client DevOps Engagements",
+      "position": "DevOps Telemetry & Code Quality Consultant",
+      "startYear": 2019,
+      "endYear": null,
+      "bullets": [
+        { "id": "dot-1", "text": "I provide the code quality and performance metrics for client teams in a DevOps environment, using Microsoft Telemetry, Splunk, SonarCloud, and SonarQube to make build health, test reliability, and defect trends visible to the whole team.", "tags": ["telemetry", "microsoft telemetry", "sonarcloud", "sonarqube", "splunk", "code quality", "metrics", "devops", "performance"] },
+        { "id": "dot-2", "text": "I instrument the CI/CD pipeline with telemetry and quality gates so I can watch build duration, test coverage, code duplication, code smells, and security hotspots instead of debating code quality by opinion.", "tags": ["ci/cd", "quality gates", "code quality", "telemetry", "testing", "automation", "devops", "metrics", "performance"] },
+        { "id": "dot-3", "text": "I trend deployment frequency, lead time for changes, change failure rate, and mean time to recovery from that telemetry so I can determine the best path to DORA metrics for each team instead of forcing one reporting model on every team.", "tags": ["dora", "metrics", "deployment frequency", "lead time", "change failure rate", "mttr", "devops", "continuous delivery", "performance"] },
+        { "id": "dot-4", "text": "I turn raw telemetry into a simple DORA and Evidence-Based Management scorecard that I review with engineering, product, and leadership stakeholders to connect code quality and performance metrics to measurable delivery outcomes.", "tags": ["dora", "ebm", "metrics", "leadership", "coaching", "reporting", "performance", "code quality", "devops"] }
+      ]
+    },
+    {
       "id": "safelite",
       "company": "Safelite Auto Glass",
       "position": "Scrum Master",
@@ -70,6 +83,8 @@
     { "name": "Generative AI Integration", "category": "Principles", "proficiency": 8, "tags": ["ai", "generative ai", "pydantic", "automation"] },
     { "name": "Docker & Containerization", "category": "Cloud Tech", "proficiency": 8, "tags": ["docker", "devops", "containers"] },
     { "name": "GitHub Actions / CI-CD", "category": "Cloud Tech", "proficiency": 8, "tags": ["ci/cd", "github actions", "devops", "git"] },
-    { "name": "C# / .NET", "category": "Programming Language", "proficiency": 8, "tags": ["c#", ".net", "backend", "software architecture"] }
+    { "name": "C# / .NET", "category": "Programming Language", "proficiency": 8, "tags": ["c#", ".net", "backend", "software architecture"] },
+    { "name": "DevOps Telemetry & Code Quality Metrics", "category": "Cloud Tech", "proficiency": 8, "tags": ["telemetry", "microsoft telemetry", "sonarcloud", "sonarqube", "code quality", "metrics", "devops", "performance", "quality gates"] },
+    { "name": "DORA Metrics & Delivery Performance Reporting", "category": "Principles", "proficiency": 8, "tags": ["dora", "metrics", "deployment frequency", "lead time", "change failure rate", "mttr", "ebm", "reporting", "performance", "devops"] }
   ]
 }
