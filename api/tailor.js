@@ -47,9 +47,10 @@ ${jobDescription}
 
 ### Instructions:
 1. Write a custom, punchy 2-sentence Professional Summary targeted directly at the key outcomes in the JD.
-2. Select the top 3 most relevant bullet points for each experience. Reword or highlight key terms to align with the JD without exaggerating or falsifying facts.
-3. Select the 6 most relevant key proficiencies/skills.
-4. Select the 3 most relevant speaking engagements.
+2. Select the top 5 most relevant bullet points for each experience. Reword or highlight key terms to align with the JD. Include metrics, outcomes, and action verbs that would make an outstanding impact. 
+  If an experience has fewer than 5 relevant bullets, include all that are relevant.
+3. Select the 10 most relevant key proficiencies/skills.  Make sure at least 10 proficiencies/skills are listed that complete the requirements of the JD are incldued.
+4. Select the 5 most relevant speaking engagements.  If 5 are not relevant then fill in with the most recent speaking engagements.  If there are no relevant speaking engagements, include the most recent ones.
 5. Return ONLY a valid, raw JSON object matching this exact structure (no markdown formatting, no code block backticks):
 
 {
@@ -60,10 +61,10 @@ ${jobDescription}
       "position": "Title",
       "startYear": 2017,
       "endYear": null,
-      "bullets": ["Selected bullet 1", "Selected bullet 2", "Selected bullet 3"]
+      "bullets": ["Selected bullet 1", "Selected bullet 2", "Selected bullet 3", "Selected bullet 4", "Selected bullet 5"]
     }
   ],
-  "proficiencies": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"],
+  "proficiencies": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8", "Skill 9", "Skill 10"],
   "speaking": [
     { "title": "Talk Title", "venue": "Venue", "year": "2026" }
   ]
