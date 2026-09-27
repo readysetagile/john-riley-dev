@@ -68,21 +68,23 @@
     overflow-y: auto; /* Add vertical scrollbar when necessary */
   }
 
- /* Add CSS for styling the speaking engagements grid */
 .speaking-engagements {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  overflow-y: auto; /* Enable vertical scrollbar if needed */
-  max-height: 33vh; /* Set maximum height to 33% of viewport height */
+  gap: 10px;
+  justify-content: flex-start;
+  width: 100%;
+  max-height: 300px; /* Restricts height to line up with the left column */
+  overflow-y: auto;  /* Restores vertical scrollbar when items overflow */
 }
 
 .speaking-engagement {
-  width: calc(100% / 4); /* Initially display 4 engagements per row */
-  margin: 5px;
+  flex: 1 1 calc(33.333% - 10px); /* 3 cards per row cleanly */
+  min-width: 200px;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: #ffffff;
 }
 
 @media print {
