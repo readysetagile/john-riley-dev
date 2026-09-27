@@ -105,6 +105,86 @@ function scoreItem(itemText, itemTags, jobTokens) {
   return score;
 }
 
+// ==========================================
+// Local Key Certification Selection Engine
+// ==========================================
+// Picks the N certifications from certifications.js that best match the job
+// description. This is a strictly LOCAL decision: no AI call and no internet
+// research are involved. It reuses the same tokenising/scoring primitives as
+// the client-side keyword matcher above.
+function selectKeyCertifications(jdText, count) {
+  const requested = count || 5;
+  const catalog = window.certificationCatalog || [];
+  const jobTokens = extractTokens(jdText || '');
+
+  if (!catalog.length) return [];
+
+  // Official Scrum.org wording for every certification, used to measure how
+  // much of the job description's language each certification actually covers.
+  const skillProfiles = catalog.map(cert =>
+    (cert.name + ' ' + (cert.synopsis || '') + ' ' + (cert.keyLearnings || []).join(' ')).toLowerCase()
+  );
+
+  // Inverse document frequency: a word shared by every certification carries
+  // almost no signal, while a word unique to one certification carries a lot.
+  // This stops generic JD wording (team, value, work, delivery) from dominating.
+  const docFrequency = {};
+  jobTokens.forEach(function (token) {
+    let df = 0;
+    skillProfiles.forEach(function (profile) {
+      if (profile.indexOf(token) !== -1) df++;
+    });
+    docFrequency[token] = df;
+  });
+
+  const scored = catalog.map((cert, index) => {
+    let score = 0;
+
+    // Strong signal: the JD contains this certification's domain keywords.
+    (cert.tags || []).forEach(tag => {
+      const parts = tag.toLowerCase().split(/\s+/).filter(p => p.length > 2);
+      if (!parts.length) return;
+      const hits = parts.filter(p => jobTokens.indexOf(p) !== -1).length;
+      if (hits === parts.length) {
+        score += 6;                        // whole keyword phrase matched
+      } else if (hits > 0) {
+        score += 2 * (hits / parts.length); // partial keyword phrase matched
+      }
+    });
+
+    // Weaker signal: distinctive JD words that appear in this certification's
+    // official synopsis and learning objectives.
+    jobTokens.forEach(token => {
+      if (skillProfiles[index].indexOf(token) !== -1) {
+        score += 2 / docFrequency[token];
+      }
+    });
+
+    return Object.assign({}, cert, { score: score });
+  });
+
+  // Deterministic ordering: relevance first, then badge weight, then name.
+  scored.sort((a, b) =>
+    b.score - a.score || b.weight - a.weight || a.name.localeCompare(b.name)
+  );
+
+  // Always return exactly `requested` entries. If fewer certifications matched
+  // the JD, fill the remainder with the highest weighted certifications (the
+  // same fallback pattern already used for speaking engagements).
+  const picked = scored.slice(0, requested);
+  if (picked.length < requested) {
+    const chosen = picked.map(c => c.id);
+    scored.forEach(cert => {
+      if (picked.length < requested && chosen.indexOf(cert.id) === -1) {
+        picked.push(cert);
+        chosen.push(cert.id);
+      }
+    });
+  }
+
+  return picked;
+}
+
 function generateTailoredResume() {
   const jdText = document.getElementById('jdInput').value;
   if (!jdText.trim()) {
@@ -211,6 +291,12 @@ async function generateAITailoredResume() {
 // Rendering & PDF Generator Engine
 // ==========================================
 function renderAIPreview(data) {
+  // Key Certifications are always resolved LOCALLY from the job description, so
+  // the decision never depends on AI or internet research. This runs for both
+  // the client-side keyword generator and the AI endpoint response.
+  const jdElement = document.getElementById('jdInput');
+  data.certifications = selectKeyCertifications(jdElement ? jdElement.value : '', 5);
+
   const previewDiv = document.getElementById('resumePreview');
 
   let html = `
@@ -251,6 +337,18 @@ function renderAIPreview(data) {
           ${data.proficiencies.map(skill => `
             <span class="bg-gray-100 text-gray-800 text-[10px] px-2 py-0.5 rounded border border-gray-300 font-medium">
               ${skill}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Key Certifications -->
+      <div class="mb-4 pdf-block">
+        <h2 class="text-sm font-bold border-b text-gray-800 pb-1 mb-1 uppercase tracking-wide">Key Certifications</h2>
+        <div class="flex flex-wrap gap-1 pt-1">
+          ${data.certifications.map(cert => `
+            <span class="bg-gray-100 text-gray-800 text-[10px] px-2 py-0.5 rounded border border-gray-300 font-medium" title="${cert.synopsis}">
+              ${cert.shortName || cert.name}
             </span>
           `).join('')}
         </div>
@@ -297,6 +395,13 @@ function closeModal() {
 
 function downloadDOCX(data) {
   const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, TabStopType, TabStopPosition } = docx;
+
+  // Key Certifications are always selected locally from the job description so
+  // the Word export always matches the preview, even when master data is used.
+  if (!data.certifications || !data.certifications.length) {
+    const jdElement = document.getElementById('jdInput');
+    data.certifications = selectKeyCertifications(jdElement ? jdElement.value : '', 5);
+  }
 
   const doc = new Document({
     styles: {
@@ -408,6 +513,26 @@ function downloadDOCX(data) {
             size: 18
           })).reduce((prev, curr) => [...prev, curr, new TextRun({ text: "  " })], [])
         }),
+
+        // Key Certifications Section (always chosen locally from the JD)
+        ...(data.certifications && data.certifications.length ? [
+          new Paragraph({
+            spacing: { before: 240, after: 120 },
+            border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+            children: [
+              new TextRun({ text: "KEY CERTIFICATIONS", bold: true, font: "Arial", size: 20, color: "111827" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 240, line: 300 },
+            children: data.certifications.map(cert => new TextRun({
+              text: `  ${cert.shortName || cert.name}  `,
+              shading: { fill: "F3F4F6" },
+              font: "Arial",
+              size: 18
+            })).reduce((prev, curr) => [...prev, curr, new TextRun({ text: "  " })], [])
+          })
+        ] : []),
 
         // Selected Presentations Section
         ...(data.speaking && data.speaking.length > 0 ? [
