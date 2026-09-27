@@ -296,9 +296,20 @@ function closeModal() {
 }
 
 function downloadDOCX(data) {
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = docx;
+  const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, TabStopType, TabStopPosition } = docx;
 
   const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Arial",
+            size: 20, // 10pt base font
+            color: "374151" // Gray-700
+          }
+        }
+      }
+    },
     sections: [{
       properties: {
         page: {
@@ -310,19 +321,20 @@ function downloadDOCX(data) {
         new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
-            new TextRun({ text: "John Riley", bold: true, size: 32, font: "Arial" }),
+            new TextRun({ text: "John Riley", bold: true, size: 32, font: "Arial", color: "111827" }),
           ]
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
+          spacing: { before: 60, after: 60 },
           children: [
             new TextRun({ text: "Principal Agile Coach & Professional Scrum Trainer (PST)", bold: true, color: "1D4ED8", size: 22, font: "Arial" }),
           ]
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 200 },
-          border: { bottom: { color: "1D4ED8", space: 4, value: BorderStyle.SINGLE, size: 12 } },
+          spacing: { after: 180 },
+          border: { bottom: { color: "1D4ED8", space: 6, value: BorderStyle.SINGLE, size: 12 } },
           children: [
             new TextRun({ text: "Columbus, OH | john@readysetagile.com | https://johnriley.dev", size: 18, color: "4B5563", font: "Arial" }),
           ]
@@ -330,52 +342,84 @@ function downloadDOCX(data) {
 
         // Professional Profile
         new Paragraph({
-          text: "PROFESSIONAL PROFILE",
-          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
           border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
-          spacing: { before: 150, after: 100 }
+          children: [
+            new TextRun({ text: "PROFESSIONAL PROFILE", bold: true, font: "Arial", size: 20, color: "111827" })
+          ]
         }),
         new Paragraph({
-          text: data.summary,
-          spacing: { after: 200 }
+          spacing: { after: 180, line: 276 },
+          children: [
+            new TextRun({ text: data.summary, font: "Arial", size: 20 })
+          ]
         }),
 
         // Relevant Experience
         new Paragraph({
-          text: "RELEVANT EXPERIENCE",
-          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 120 },
           border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
-          spacing: { before: 150, after: 100 }
+          children: [
+            new TextRun({ text: "RELEVANT EXPERIENCE", bold: true, font: "Arial", size: 20, color: "111827" })
+          ]
         }),
         ...data.experiences.flatMap(exp => [
           new Paragraph({
+            spacing: { before: 120, after: 40 },
+            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
             children: [
-              new TextRun({ text: exp.position, bold: true, size: 20 }),
-              new TextRun({ text: ` @ ${exp.company}`, bold: true, color: "1D4ED8", size: 20 }),
-              new TextRun({ text: `\t${exp.startYear} - ${exp.endYear || 'Present'}`, color: "6B7280", size: 18 })
+              new TextRun({ text: exp.position, bold: true, font: "Arial", size: 20, color: "111827" }),
+              new TextRun({ text: ` @ ${exp.company}`, bold: true, font: "Arial", color: "1D4ED8", size: 20 }),
+              new TextRun({ text: `\t${exp.startYear} - ${exp.endYear || 'Present'}`, font: "Arial", color: "6B7280", size: 18 })
             ]
           }),
           ...exp.bullets.map(b => new Paragraph({
-            text: b,
-            bullet: { level: 0 }
+            bullet: { level: 0 },
+            spacing: { after: 40, line: 260 },
+            children: [
+              new TextRun({ text: b, font: "Arial", size: 19 })
+            ]
           }))
         ]),
 
-        // Key Proficiencies (Pills / Badges in Word)
+        // Key Proficiencies
         new Paragraph({
-          text: "KEY PROFICIENCIES",
-          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 200, after: 100 },
           border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
-          spacing: { before: 200, after: 100 }
+          children: [
+            new TextRun({ text: "KEY PROFICIENCIES", bold: true, font: "Arial", size: 20, color: "111827" })
+          ]
         }),
         new Paragraph({
+          spacing: { after: 180 },
           children: data.proficiencies.map(skill => new TextRun({
             text: `  ${skill}  `,
             shading: { fill: "F3F4F6" },
             font: "Arial",
             size: 18
           })).reduce((prev, curr) => [...prev, curr, new TextRun({ text: "  " })], [])
-        })
+        }),
+
+        // Selected Presentations / Public Engagements
+        ...(data.speaking && data.speaking.length > 0 ? [
+          new Paragraph({
+            spacing: { before: 200, after: 100 },
+            border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+            children: [
+              new TextRun({ text: "SELECTED PRESENTATIONS", bold: true, font: "Arial", size: 20, color: "111827" })
+            ]
+          }),
+          ...data.speaking.map(s => new Paragraph({
+            bullet: { level: 0 },
+            spacing: { after: 40 },
+            children: [
+              new TextRun({ text: s.title, bold: true, font: "Arial", size: 19, color: "111827" }),
+              new TextRun({ text: ` — `, font: "Arial", size: 19 }),
+              new TextRun({ text: s.venue, italics: true, font: "Arial", size: 19 }),
+              new TextRun({ text: ` (${s.year})`, font: "Arial", size: 19, color: "6B7280" })
+            ]
+          }))
+        ] : [])
       ]
     }]
   });
