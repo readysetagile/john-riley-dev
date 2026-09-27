@@ -31,30 +31,6 @@ const speakingEngagements = [
       venue: "(Virtual Venue)"
     },
     {
-      date: "2026-09-23",
-      location: "Upper Arlington, OH",
-      title: "Women in Agile AI Learning Circle",
-      venue: "Ready Set Agile / COhatch"
-    },
-    {
-      date: "2026-08-04",
-      location: "Columbus, OH",
-      title: "Agile Practices & Continuous Learning Workshop",
-      venue: "World Class Title"
-    },
-    {
-      date: "2025-08-27",
-      location: "Columbus, OH",
-      title: "Charting Your Path: Professional Development & Career Readiness",
-      venue: "IIBA Columbus Chapter"
-    },
-    {
-      date: "2020-04-28",
-      location: "Columbus, OH",
-      title: "Play With Docker Workshop",
-      venue: "(Virtual Venue)"
-    },
-    {
       date: "2017-08-10",
       location: "Orlando, FL",
       title: "How ATDD Saved Your Agile Flow",
@@ -163,12 +139,6 @@ const speakingEngagements = [
       venue: "Columbus Free Code Camp"
     },
     {
-      date: "2020-04-28",
-      location: "Columbus, OH",
-      title: "Play With Docker Workshop",
-      venue: "(Virtual Venue)"
-    },
-    {
       date: "2020-04-21",
       location: "Columbus, OH",
       title: "How Are We Responding to This Change?",
@@ -188,7 +158,23 @@ speakingEngagements.sort(compareDates);
 function createSpeakingEngagementsGrid(engagements) {
     const container = document.getElementById('speaking-engagements');
 
+    // Guard against the same engagement being rendered more than once. A talk
+    // with the same date, title and venue is the same event, so only one card is
+    // created for it. Genuine repeat talks (same title on a different date or at
+    // a different venue) are still rendered separately.
+    const renderedEngagements = new Set();
+
     engagements.forEach(engagement => {
+        const engagementKey = [engagement.date, engagement.title, engagement.venue]
+            .map(value => String(value === undefined || value === null ? '' : value)
+                .toLowerCase().replace(/\s+/g, ' ').trim())
+            .join(' || ');
+
+        if (renderedEngagements.has(engagementKey)) {
+            return;
+        }
+        renderedEngagements.add(engagementKey);
+
         const engagementElement = document.createElement('div');
         engagementElement.classList.add('speaking-engagement');
         engagementElement.innerHTML = `
