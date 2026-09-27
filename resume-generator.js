@@ -313,60 +313,69 @@ function downloadDOCX(data) {
     sections: [{
       properties: {
         page: {
+          // Force explicit 8.5 x 11 inch dimensions (in twips: 1 in = 1440 twips)
+          size: {
+            width: 12240,  // 8.5 inches
+            height: 15840  // 11.0 inches
+          },
           margin: { top: 720, bottom: 720, left: 720, right: 720 } // 0.5 in margins
         }
       },
       children: [
-        // Header
+        // Header Name
         new Paragraph({
           alignment: AlignmentType.CENTER,
+          spacing: { before: 0, after: 60 },
           children: [
             new TextRun({ text: "John Riley", bold: true, size: 32, font: "Arial", color: "111827" }),
           ]
         }),
+        // Subtitle
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { before: 60, after: 60 },
+          spacing: { before: 0, after: 60 },
           children: [
             new TextRun({ text: "Principal Agile Coach & Professional Scrum Trainer (PST)", bold: true, color: "1D4ED8", size: 22, font: "Arial" }),
           ]
         }),
+        // Contact Bar with Accent Line
         new Paragraph({
           alignment: AlignmentType.CENTER,
-          spacing: { after: 180 },
-          border: { bottom: { color: "1D4ED8", space: 6, value: BorderStyle.SINGLE, size: 12 } },
+          spacing: { before: 0, after: 240 },
+          border: { bottom: { color: "1D4ED8", space: 8, value: BorderStyle.SINGLE, size: 18 } },
           children: [
             new TextRun({ text: "Columbus, OH | john@readysetagile.com | https://johnriley.dev", size: 18, color: "4B5563", font: "Arial" }),
           ]
         }),
 
-        // Professional Profile
+        // Professional Profile Section
         new Paragraph({
-          spacing: { before: 180, after: 80 },
-          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 200, after: 120 },
+          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "PROFESSIONAL PROFILE", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
         }),
         new Paragraph({
-          spacing: { after: 180, line: 276 },
+          spacing: { after: 240, line: 280 },
           children: [
             new TextRun({ text: data.summary, font: "Arial", size: 20 })
           ]
         }),
 
-        // Relevant Experience
+        // Relevant Experience Section
         new Paragraph({
-          spacing: { before: 180, after: 120 },
-          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 200, after: 140 },
+          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "RELEVANT EXPERIENCE", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
         }),
         ...data.experiences.flatMap(exp => [
           new Paragraph({
-            spacing: { before: 120, after: 40 },
-            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+            spacing: { before: 160, after: 80 },
+            // Set right-aligned tab stop exactly at page printable border (12240 - 720 - 720 = 10800 twips)
+            tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
             children: [
               new TextRun({ text: exp.position, bold: true, font: "Arial", size: 20, color: "111827" }),
               new TextRun({ text: ` @ ${exp.company}`, bold: true, font: "Arial", color: "1D4ED8", size: 20 }),
@@ -375,23 +384,23 @@ function downloadDOCX(data) {
           }),
           ...exp.bullets.map(b => new Paragraph({
             bullet: { level: 0 },
-            spacing: { after: 40, line: 260 },
+            spacing: { before: 40, after: 80, line: 270 },
             children: [
               new TextRun({ text: b, font: "Arial", size: 19 })
             ]
           }))
         ]),
 
-        // Key Proficiencies
+        // Key Proficiencies Section
         new Paragraph({
-          spacing: { before: 200, after: 100 },
-          border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+          spacing: { before: 240, after: 120 },
+          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "KEY PROFICIENCIES", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
         }),
         new Paragraph({
-          spacing: { after: 180 },
+          spacing: { after: 240, line: 300 },
           children: data.proficiencies.map(skill => new TextRun({
             text: `  ${skill}  `,
             shading: { fill: "F3F4F6" },
@@ -400,18 +409,18 @@ function downloadDOCX(data) {
           })).reduce((prev, curr) => [...prev, curr, new TextRun({ text: "  " })], [])
         }),
 
-        // Selected Presentations / Public Engagements
+        // Selected Presentations Section
         ...(data.speaking && data.speaking.length > 0 ? [
           new Paragraph({
-            spacing: { before: 200, after: 100 },
-            border: { bottom: { color: "D1D5DB", space: 2, value: BorderStyle.SINGLE, size: 6 } },
+            spacing: { before: 240, after: 120 },
+            border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
             children: [
               new TextRun({ text: "SELECTED PRESENTATIONS", bold: true, font: "Arial", size: 20, color: "111827" })
             ]
           }),
           ...data.speaking.map(s => new Paragraph({
             bullet: { level: 0 },
-            spacing: { after: 40 },
+            spacing: { before: 40, after: 80, line: 260 },
             children: [
               new TextRun({ text: s.title, bold: true, font: "Arial", size: 19, color: "111827" }),
               new TextRun({ text: ` — `, font: "Arial", size: 19 }),
