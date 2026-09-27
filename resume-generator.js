@@ -32,12 +32,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function renderAIPreview(data) {
-  // Save active dataset globally for DOCX export
-  window.currentTailoredResume = data;
+// ==========================================
+// Shared export data resolution (PDF + DOCX)
+// ==========================================
+// Both exports use the tailored resume when one has been generated and fall
+// back to the master resume otherwise, so the downloaded file always matches
+// what is shown in the Tailored Resume Preview.
+function buildExportData() {
+  const source = window.currentTailoredResume || window.masterResumeData;
+  if (!source) return null;
 
-  const previewDiv = document.getElementById('resumePreview');
-  // ... rest of renderAIPreview code ...
+  let formatted = source;
+
+  // Format raw master data (which nests details under `basics`) for export.
+  if (!source.summary && source.basics) {
+    formatted = {
+      summary: source.basics.summary,
+      experiences: source.experiences.map(exp => ({
+        company: exp.company,
+        position: exp.position,
+        startYear: exp.startYear,
+        endYear: exp.endYear,
+        bullets: exp.bullets.slice(0, 3).map(b => typeof b === 'string' ? b : b.text)
+      })),
+      proficiencies: source.proficiencies.slice(0, 6).map(p => typeof p === 'string' ? p : p.name),
+      speaking: source.speaking.slice(0, 3).map(s => ({
+        title: s.title,
+        venue: s.venue,
+        year: s.date ? s.date.split('-')[0] : '2026'
+      }))
+    };
+  }
+
+  // Key Certifications are always selected locally from the job description.
+  if (!formatted.certifications || !formatted.certifications.length) {
+    const jdElement = document.getElementById('jdInput');
+    formatted.certifications = selectKeyCertifications(jdElement ? jdElement.value : '', 5);
+  }
+
+  return formatted;
 }
 
 // docx generator
@@ -46,35 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (docxBtn) {
     docxBtn.addEventListener('click', () => {
-      const dataToExport = window.currentTailoredResume || window.masterResumeData;
+      const dataToExport = buildExportData();
 
       if (!dataToExport) {
         alert("No resume data available to export.");
         return;
       }
 
-      // Format master data if raw masterResumeData is used directly
-      let formatted = dataToExport;
-      if (!dataToExport.summary && dataToExport.basics) {
-        formatted = {
-          summary: dataToExport.basics.summary,
-          experiences: dataToExport.experiences.map(exp => ({
-            company: exp.company,
-            position: exp.position,
-            startYear: exp.startYear,
-            endYear: exp.endYear,
-            bullets: exp.bullets.slice(0, 3).map(b => typeof b === 'string' ? b : b.text)
-          })),
-          proficiencies: dataToExport.proficiencies.slice(0, 6).map(p => typeof p === 'string' ? p : p.name),
-          speaking: dataToExport.speaking.slice(0, 3).map(s => ({
-            title: s.title,
-            venue: s.venue,
-            year: s.date ? s.date.split('-')[0] : '2026'
-          }))
-        };
-      }
-
-      downloadDOCX(formatted);
+      downloadDOCX(dataToExport);
     });
   }
 });
@@ -291,6 +303,10 @@ async function generateAITailoredResume() {
 // Rendering & PDF Generator Engine
 // ==========================================
 function renderAIPreview(data) {
+  // Save the active dataset globally so the PDF and DOCX exports use the same
+  // tailored resume that is displayed in the preview.
+  window.currentTailoredResume = data;
+
   // Key Certifications are always resolved LOCALLY from the job description, so
   // the decision never depends on AI or internet research. This runs for both
   // the client-side keyword generator and the AI endpoint response.
@@ -376,17 +392,273 @@ function renderAIPreview(data) {
 }
 
 function downloadPDF() {
-  const element = document.getElementById('pdfContainer');
-  const opt = {
-    margin:       0,
-    filename:     'John_Riley_Resume.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
-    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+  const data = buildExportData();
+
+  if (!data) {
+    alert("No resume data available to export.");
+    return;
+  }
+
+  downloadResumePDF(data);
+}
+
+// ==========================================
+// PDF Generator - programmatic, text-based output
+// ==========================================
+// The PDF is written directly with jsPDF text/fill calls instead of being
+// rasterised from the HTML preview. That means:
+//   * the PDF has a real, selectable text layer (searchable and readable by
+//     ATS/parsing tools, unlike an html2canvas image),
+//   * there is no leftover whitespace at the top of page 1, and
+//   * content flows onto extra pages instead of being clipped to one page.
+function downloadResumePDF(data) {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("The PDF library did not load. Please check your connection and try again.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+
+  // Letter page maths (72pt per inch).
+  const PAGE_W = 612;
+  const PAGE_H = 792;
+  const MARGIN = 40;
+  const RIGHT = PAGE_W - MARGIN;
+  const CONTENT_W = PAGE_W - MARGIN * 2;
+  const BOTTOM = PAGE_H - MARGIN;
+
+  // Palette mirrors the preview (Tailwind gray/blue scale).
+  const INK     = [17, 24, 39];    // gray-900
+  const BODY    = [55, 65, 81];    // gray-700
+  const MUTED   = [107, 114, 128]; // gray-500
+  const BLUE    = [29, 78, 216];   // blue-700
+  const RULE    = [209, 213, 219]; // gray-300
+  const CHIP_BG = [243, 244, 246]; // gray-100
+
+  const FONT = 'helvetica';
+  let y = MARGIN;
+
+  // Break to a new page when `needed` points will not fit. Returns true when a
+  // page was added so callers can reset their horizontal position.
+  const ensure = (needed) => {
+    if (y + needed > BOTTOM) {
+      doc.addPage();
+      y = MARGIN;
+      return true;
+    }
+    return false;
   };
 
-  html2pdf().set(opt).from(element).save();
+  const setStyle = (size, style, color) => {
+    doc.setFont(FONT, style || 'normal');
+    doc.setFontSize(size);
+    doc.setTextColor(color[0], color[1], color[2]);
+  };
+
+  // Single-style wrapped paragraph. `y` always tracks the top of the next block.
+  const paragraph = (text, opts) => {
+    const o = opts || {};
+    const size = o.size || 9.5;
+    const lineH = o.lineHeight || size * 1.32;
+    const indent = o.indent || 0;
+    const width = o.width || (CONTENT_W - indent);
+
+    setStyle(size, o.style, o.color || BODY);
+    const lines = doc.splitTextToSize(String(text === null || text === undefined ? '' : text), width);
+
+    ensure(lines.length * lineH + (o.after || 0) + (o.bullet ? 3 : 0));
+
+    if (o.bullet) {
+      doc.setFillColor(BODY[0], BODY[1], BODY[2]);
+      doc.circle(MARGIN + 2.5, y + size * 0.42, 1.2, 'F');
+    }
+
+    doc.text(lines, MARGIN + indent, y + size);
+    y += lines.length * lineH + (o.after || 0);
+  };
+
+  // A row of differently styled fragments (e.g. bold title + blue company).
+  // Drawn inline when the whole row fits; otherwise each fragment becomes its
+  // own wrapped block. This avoids ever drawing overlapping or clipped text.
+  const inline = (segments, opts) => {
+    const o = opts || {};
+    const size = o.size || 9.5;
+    const lineH = o.lineHeight || size * 1.32;
+    const indent = o.indent || 0;
+    const maxW = o.maxWidth || (CONTENT_W - indent);
+
+    const measured = segments.map(seg => {
+      const style = seg.bold ? 'bold' : (seg.italics ? 'italic' : 'normal');
+      const text = String(seg.text === null || seg.text === undefined ? '' : seg.text);
+      doc.setFont(FONT, style);
+      doc.setFontSize(size);
+      return {
+        text: text,
+        style: style,
+        color: seg.color || BODY,
+        width: doc.getTextWidth(text)
+      };
+    });
+
+    const total = measured.reduce((sum, seg) => sum + seg.width, 0);
+
+    if (total <= maxW) {
+      ensure(lineH + 3);
+
+      if (o.bullet) {
+        doc.setFillColor(BODY[0], BODY[1], BODY[2]);
+        doc.circle(MARGIN + 2.5, y + size * 0.42, 1.2, 'F');
+      }
+
+      let x = MARGIN + indent;
+      measured.forEach(seg => {
+        setStyle(size, seg.style, seg.color);
+        doc.text(seg.text, x, y + size);
+        x += seg.width;
+      });
+      y += lineH + 3 + (o.after || 0);
+      return;
+    }
+
+    measured.forEach((seg, index) => paragraph(seg.text, {
+      size: size,
+      style: seg.style,
+      color: seg.color,
+      indent: indent,
+      lineHeight: lineH,
+      after: 1,
+      bullet: Boolean(o.bullet) && index === 0
+    }));
+  };
+
+  // Uppercase section heading with the same rule line used in the preview.
+  const heading = (title) => {
+    ensure(30);
+    setStyle(10.5, 'bold', INK);
+    doc.text(String(title).toUpperCase(), MARGIN, y + 9);
+    y += 13;
+
+    doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+    doc.setLineWidth(0.75);
+    doc.line(MARGIN, y, RIGHT, y);
+    y += 8;
+  };
+
+  // Row of rounded "chips" that wrap onto as many lines as required.
+  const chips = (items) => {
+    const size = 8.5;
+    const padX = 6;
+    const padY = 3.5;
+    const gap = 5;
+    const h = size + padY * 2;
+    let x = MARGIN;
+
+    (items || []).forEach(label => {
+      const text = String(label);
+      doc.setFont(FONT, 'normal');
+      doc.setFontSize(size);
+      const w = doc.getTextWidth(text) + padX * 2;
+
+      if (x + w > RIGHT) {
+        x = MARGIN;
+        y += h + gap;
+      }
+      if (ensure(h + 2)) x = MARGIN;
+
+      doc.setFillColor(CHIP_BG[0], CHIP_BG[1], CHIP_BG[2]);
+      doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(x, y, w, h, 2, 2, 'FD');
+
+      setStyle(size, 'normal', BODY);
+      doc.text(text, x + padX, y + h - padY - 1.2);
+      x += w + gap;
+    });
+
+    y += h + 8;
+  };
+
+  // ---------- Header ----------
+  doc.setProperties({
+    title: 'John Riley - Resume',
+    author: 'John Riley',
+    subject: 'Principal Agile Coach & Professional Scrum Trainer'
+  });
+
+  setStyle(19, 'bold', INK);
+  doc.text('John Riley', PAGE_W / 2, y + 19, { align: 'center' });
+  y += 25;
+
+  setStyle(11, 'bold', BLUE);
+  doc.text('Principal Agile Coach & Professional Scrum Trainer (PST)', PAGE_W / 2, y + 11, { align: 'center' });
+  y += 17;
+
+  setStyle(8.5, 'normal', MUTED);
+  doc.text('Columbus, OH  |  john@readysetagile.com  |  https://johnriley.dev', PAGE_W / 2, y + 8.5, { align: 'center' });
+  y += 14;
+
+  // Accent rule beneath the header (mirrors the preview's header border).
+  doc.setDrawColor(BLUE[0], BLUE[1], BLUE[2]);
+  doc.setLineWidth(1.6);
+  doc.line(MARGIN, y, RIGHT, y);
+  y += 16;
+
+  // ---------- Professional Profile ----------
+  heading('Professional Profile');
+  paragraph(data.summary, { after: 6 });
+
+  // ---------- Relevant Experience ----------
+  heading('Relevant Experience');
+
+  (data.experiences || []).forEach(exp => {
+    const dateText = exp.startYear + ' - ' + (exp.endYear ? exp.endYear : 'Present');
+
+    doc.setFont(FONT, 'normal');
+    doc.setFontSize(8.5);
+    const dateW = doc.getTextWidth(dateText);
+
+    ensure(30);
+    const titleTop = y;
+
+    inline([
+      { text: exp.position, bold: true, color: INK },
+      { text: '   @ ' + exp.company, bold: true, color: BLUE }
+    ], { size: 10, maxWidth: CONTENT_W - dateW - 10 });
+
+    setStyle(8.5, 'normal', MUTED);
+    doc.text(dateText, RIGHT, titleTop + 10, { align: 'right' });
+
+    (exp.bullets || []).forEach(bullet => {
+      paragraph(bullet, { indent: 12, bullet: true, after: 1 });
+    });
+
+    y += 6;
+  });
+
+  // ---------- Key Proficiencies ----------
+  heading('Key Proficiencies');
+  chips(data.proficiencies);
+
+  // ---------- Key Certifications ----------
+  heading('Key Certifications');
+  chips((data.certifications || []).map(cert => cert.shortName || cert.name));
+
+  // ---------- Selected Presentations ----------
+  if (data.speaking && data.speaking.length) {
+    heading('Selected Presentations');
+
+    data.speaking.forEach(s => {
+      inline([
+        { text: s.title, bold: true, color: INK },
+        { text: ' — ' + s.venue + ' (' + s.year + ')', italics: true, color: MUTED }
+      ], { indent: 12, bullet: true, after: 2 });
+    });
+  }
+
+  doc.save('John_Riley_Resume.pdf');
+
 }
 
 function closeModal() {
@@ -447,7 +719,7 @@ function downloadDOCX(data) {
         new Paragraph({
           alignment: AlignmentType.CENTER,
           spacing: { before: 0, after: 240 },
-          border: { bottom: { color: "1D4ED8", space: 8, value: BorderStyle.SINGLE, size: 18 } },
+          border: { bottom: { color: "1D4ED8", space: 8, style: BorderStyle.SINGLE, size: 18 } },
           children: [
             new TextRun({ text: "Columbus, OH | john@readysetagile.com | https://johnriley.dev", size: 18, color: "4B5563", font: "Arial" }),
           ]
@@ -456,7 +728,7 @@ function downloadDOCX(data) {
         // Professional Profile Section
         new Paragraph({
           spacing: { before: 200, after: 120 },
-          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+          border: { bottom: { color: "D1D5DB", space: 4, style: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "PROFESSIONAL PROFILE", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
@@ -471,7 +743,7 @@ function downloadDOCX(data) {
         // Relevant Experience Section
         new Paragraph({
           spacing: { before: 200, after: 140 },
-          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+          border: { bottom: { color: "D1D5DB", space: 4, style: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "RELEVANT EXPERIENCE", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
@@ -499,7 +771,7 @@ function downloadDOCX(data) {
         // Key Proficiencies Section
         new Paragraph({
           spacing: { before: 240, after: 120 },
-          border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+          border: { bottom: { color: "D1D5DB", space: 4, style: BorderStyle.SINGLE, size: 8 } },
           children: [
             new TextRun({ text: "KEY PROFICIENCIES", bold: true, font: "Arial", size: 20, color: "111827" })
           ]
@@ -518,7 +790,7 @@ function downloadDOCX(data) {
         ...(data.certifications && data.certifications.length ? [
           new Paragraph({
             spacing: { before: 240, after: 120 },
-            border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+            border: { bottom: { color: "D1D5DB", space: 4, style: BorderStyle.SINGLE, size: 8 } },
             children: [
               new TextRun({ text: "KEY CERTIFICATIONS", bold: true, font: "Arial", size: 20, color: "111827" })
             ]
@@ -538,7 +810,7 @@ function downloadDOCX(data) {
         ...(data.speaking && data.speaking.length > 0 ? [
           new Paragraph({
             spacing: { before: 240, after: 120 },
-            border: { bottom: { color: "D1D5DB", space: 4, value: BorderStyle.SINGLE, size: 8 } },
+            border: { bottom: { color: "D1D5DB", space: 4, style: BorderStyle.SINGLE, size: 8 } },
             children: [
               new TextRun({ text: "SELECTED PRESENTATIONS", bold: true, font: "Arial", size: 20, color: "111827" })
             ]
